@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+chromadb
+sentence-transformers
+langchain==0.3.7
+langchain-text-splitters==0.3.0
+openai
+python-dotenv
+requests
