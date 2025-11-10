@@ -40,4 +40,3 @@ class RAGEngine:
         q_emb = self.embedder.encode([query]).tolist()
         result = self.collection.query(query_embeddings=q_emb, n_results=top_k)
         return result["documents"][0]
-v2

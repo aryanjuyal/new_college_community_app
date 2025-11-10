@@ -1,45 +1,56 @@
 
+import os
+import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.intent_engine import detect_intent
-from app.rag_engine import RAGEngine
-from app.live_data import fetch_events, fetch_lost_found
-from app.llm_generator import generate_answer
+from typing import List, Dict
+from dotenv import load_dotenv
 
-app = FastAPI(title="Community App Chatbot")
+
+from app.llm_generator import generate_answer
+from app.rag_engine import RAGEngine
+from app.moderation_model import analyze_post
+from app.recommendation_model import recommend_posts
+
+load_dotenv()
+
+app = FastAPI(title="College Community ML API")
+
 rag = RAGEngine()
 
-class ChatRequest(BaseModel):
-    user_id: int | None = None
+
+class ChatInput(BaseModel):
     message: str
 
-@app.on_event("startup")
-def setup():
-    try:
-        rag.index_kb()
-    except:
-        print("KB already indexed ✅")
+class PostInput(BaseModel):
+    text: str
 
-@app.post("/chat/")
-def chat(req: ChatRequest):
-    msg = req.message
-    intent = detect_intent(msg)
+class RecommendationInput(BaseModel):
+    user_id: int
+    users: List[Dict]
+    posts: List[Dict]
+    interactions: List[Dict]
 
-    if intent == "events_query":
-        events = fetch_events()
-        context = "\n".join(events)
-    elif intent == "lost_found_query":
-        items = fetch_lost_found()
-        context = "\n".join(items)
-    elif intent == "info_query":
-        docs = rag.retrieve(msg)
-        context = "\n".join(docs)
-    else:
-        context = "General college chatbot — ask me about events, lost items, or how to use the app!"
-
-    answer = generate_answer(context, msg)
-    return {"intent": intent, "answer": answer, "context": context}
 
 @app.get("/")
 def root():
-    return {"message": "Community Chatbot is live 🚀"}
+    return {"message": "🚀 College Community ML API running"}
+
+@app.post("/chat/")
+def chat(data: ChatInput):
+    msg = data.message
+    context = "Some context from RAG or live data (simplified for now)"
+    answer = generate_answer(context, msg)
+    return {"answer": answer}
+
+@app.post("/moderate-post/")
+def moderate_post(data: PostInput):
+    return analyze_post(data.text)
+
+@app.post("/recommend-posts/")
+def recommend(data: RecommendationInput):
+    users_df = pd.DataFrame(data.users)
+    posts_df = pd.DataFrame(data.posts)
+    interactions_df = pd.DataFrame(data.interactions)
+    recs = recommend_posts(data.user_id, users_df, posts_df, interactions_df)
+    return {"user_id": data.user_id, "recommendations": recs}
