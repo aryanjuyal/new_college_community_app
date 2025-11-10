@@ -1,29 +1,28 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
-import NavBar from './Navbar';
+import NavBar from './NavBar';
+import LoadingSpinner from './LoadingSpinner';
+import Chatbot from '../chatbot/chatbot';
 
 function ProtectedRoute() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    // Wait until we know if the user is logged in or not
     return <LoadingSpinner />;
   }
 
   if (!user) {
-    // User is not logged in, redirect them to the /auth page
     return <Navigate to="/auth" replace />;
   }
 
-  // User is logged in! Show the NavBar and the requested page.
-  // The <Outlet /> is a placeholder for the page (e.g., FeedPage, ProfilePage)
   return (
     <>
       <NavBar />
       <main className="main-layout">
         <Outlet />
       </main>
+      <Chatbot /> {/* <-- 2. ADD THE CHATBOT COMPONENT HERE */}
     </>
   );
 }
