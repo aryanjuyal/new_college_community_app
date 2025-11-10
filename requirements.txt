@@ -1,9 +1,11 @@
 fastapi
 uvicorn
-chromadb
+groq
+transformers
+scikit-learn
+pandas
 sentence-transformers
 langchain==0.3.7
 langchain-text-splitters==0.3.0
-openai
+chromadb
 python-dotenv
-requests
