@@ -33,20 +33,20 @@ const chatbotApi = axios.create({
 // --- Auth Service ---
 export const login = (username, password) => api.post('/auth/login/', { username, password });
 export const register = (userData) => api.post('/auth/register/', userData);
-export const getMe = () => api.get('/auth/me/');
+export const getMe = () => api.get('/auth/profile/');
 
 // --- Post Service ---
-export const getPosts = () => api.get('/posts/');
-export const createPost = (formData) => api.post('/posts/', formData, {
+export const getPosts = () => api.get('/forums/posts/');
+export const createPost = (formData) => api.post('/forums/posts/create/', formData, {
   headers: {
     'Content-Type': 'multipart/form-data',
   },
 });
 export const deletePost = (postId) => api.delete(`/posts/${postId}/`);
-export const addComment = (postId, text) => api.post(`/posts/${postId}/comment/`, { text });
+export const addComment = (postId, text) => api.post(`forums/posts/${postId}/comment/`, { text });
 
 // --- Event Service ---
-export const getEvents = () => api.get('/events/');
+export const getEvents = () => api.get('/events/lists/');
 export const createEvent = (eventData) => api.post('/events/', eventData);
 
 // --- User/Profile Service ---
